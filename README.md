@@ -23,7 +23,12 @@ Features include **wishlist ❤️, cart with quantity control, checkout popup a
 - Backend: FastAPI, Python
 - Database: MongoDB
 
-- <p align="center">
-  <img src="https://svg-banners.vercel.app/api?type=typeWriter&text=E-Commerce%20Web%20App%20%7C%20React%20%2B%20FastAPI%20%2B%20MongoDB&width=1000&height=200" />
+- <h1 align="center">🛒 E-Commerce Web App</h1>
+<p align="center">
+  <strong>React • FastAPI • MongoDB</strong>
+</p>
+
+<p align="center">
+Full-stack E-Commerce application with wishlist ❤️, cart with quantity control, animated checkout popup, and clean responsive UI.
 </p>
 
