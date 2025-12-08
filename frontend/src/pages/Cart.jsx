@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "https://e-commerce-78nv.onrender.com"; // ✅ BASE URL ONLY
+const API = "https://e-commerce-78nv.onrender.com"; 
 
 function Cart() {
   const [cart, setCart] = useState([]);
@@ -19,20 +19,14 @@ function Cart() {
 
   const removeItem = (id) => {
     axios.delete(`${API}/cart/remove/${id}`)
-      .then(() => {
-        loadCart();
-        window.dispatchEvent(new Event("storage"));
-      })
+      .then(() => loadCart())
       .catch(() => alert("Remove failed"));
   };
 
   const checkout = () => {
     setShowPopup(true);
 
-    axios.delete(`${API}/cart/clear`).then(() => {
-      loadCart();
-      window.dispatchEvent(new Event("storage"));
-    });
+    axios.delete(`${API}/cart/clear`).then(() => loadCart());
   };
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -46,7 +40,7 @@ function Cart() {
       ) : (
         <>
           {cart.map(item => (
-            <div key={item._id} style={{
+            <div key={item.product_id} style={{
               display: "flex",
               gap: "20px",
               borderBottom: "1px solid #ddd",
@@ -75,7 +69,7 @@ function Cart() {
 
       {showPopup && (
         <div style={styles.popupOverlay}>
-          <div style={styles.popupBox} className="popup-animate">
+          <div style={styles.popupBox}>
             <h2>Order Placed Successfully 🎉</h2>
             <p>Your order has been confirmed!</p>
 
@@ -88,23 +82,6 @@ function Cart() {
           </div>
         </div>
       )}
-
-      <style>{`
-        .popup-animate {
-          animation: slideUpFadeIn 0.6s ease-out forwards;
-        }
-
-        @keyframes slideUpFadeIn {
-          0% {
-            opacity: 0;
-            transform: translateY(40px) scale(0.95);
-          }
-          100% {
-            opacity: 1;
-            transform: translateY(0px) scale(1);
-          }
-        }
-      `}</style>
     </div>
   );
 }
@@ -126,7 +103,6 @@ const styles = {
     width: "300px",
     textAlign: "center",
     boxShadow: "0 4px 12px rgba(0,0,0,0.3)",
-    opacity: 0
   },
   closeButton: {
     marginTop: "15px",
