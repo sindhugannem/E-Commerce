@@ -4,7 +4,7 @@ function App() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/products/")
+    fetch("https://e-commerce-78nv.onrender.com/products")
       .then(res => res.json())
       .then(data => {
         console.log("Backend Response:", data);

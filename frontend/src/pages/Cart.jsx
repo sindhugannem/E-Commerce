@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "https://e-commerce-78nv.onrender.com";
+const API = "https://e-commerce-78nv.onrender.com/cart";
 
 function Cart() {
   const [cart, setCart] = useState([]);
