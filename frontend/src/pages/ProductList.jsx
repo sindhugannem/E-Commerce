@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "https://e-commerce-78nv.onrender.com"; // ✅ BASE URL ONLY
+const API = "https://e-commerce-78nv.onrender.com"; 
 
 function ProductList() {
   const [products, setProducts] = useState([]);
