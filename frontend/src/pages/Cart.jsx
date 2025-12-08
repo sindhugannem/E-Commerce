@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "https://e-commerce-78nv.onrender.com/cart";
+const API = "https://e-commerce-78nv.onrender.com"; // ✅ BASE URL ONLY
 
 function Cart() {
   const [cart, setCart] = useState([]);
@@ -73,7 +73,6 @@ function Cart() {
         </>
       )}
 
-      {/* Animated Popup */}
       {showPopup && (
         <div style={styles.popupOverlay}>
           <div style={styles.popupBox} className="popup-animate">
@@ -90,7 +89,6 @@ function Cart() {
         </div>
       )}
 
-      {/* Inline CSS animation */}
       <style>{`
         .popup-animate {
           animation: slideUpFadeIn 0.6s ease-out forwards;
@@ -120,7 +118,6 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    animation: "fadeIn 0.5s ease"
   },
   popupBox: {
     background: "white",

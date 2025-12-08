@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "https://e-commerce-78nv.onrender.com";
+const API = "https://e-commerce-78nv.onrender.com"; // ✅ BASE URL ONLY
 
 function ProductList() {
   const [products, setProducts] = useState([]);
@@ -13,20 +13,16 @@ function ProductList() {
       .then(res => {
         setProducts(res.data);
 
-        // Load wishlist from localStorage
         const storedWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
         setWishlist(storedWishlist);
 
-        // Default quantity = 1 for all products
         const defaultQty = {};
         res.data.forEach(p => defaultQty[p.id] = 1);
         setQuantities(defaultQty);
-
       })
       .catch(() => alert("Failed to load products"));
   }, []);
 
-  // ❤️ Add/Remove Wishlist
   const toggleWishlist = (productId) => {
     let updated = [];
 
@@ -40,17 +36,14 @@ function ProductList() {
     localStorage.setItem("wishlist", JSON.stringify(updated));
   };
 
-  // 🔢 Quantity Increase
   const increaseQty = (id) => {
     setQuantities(prev => ({ ...prev, [id]: prev[id] + 1 }));
   };
 
-  // 🔢 Quantity Decrease
   const decreaseQty = (id) => {
     setQuantities(prev => ({ ...prev, [id]: Math.max(1, prev[id] - 1) }));
   };
 
-  // 🛒 Add To Cart
   const addToCart = (p) => {
     const qty = quantities[p.id];
 
@@ -72,7 +65,6 @@ function ProductList() {
       .catch(() => alert("Add to cart failed"));
   };
 
-
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>Products</h2>
@@ -81,7 +73,6 @@ function ProductList() {
         {products.map((p) => (
           <div key={p.id} style={styles.card} className="card-hover">
 
-            {/* ❤️ Wishlist Button */}
             <div
               style={styles.wishlist}
               onClick={() => toggleWishlist(p.id)}
@@ -92,10 +83,8 @@ function ProductList() {
             <img src={p.image} alt={p.name} style={styles.image} />
 
             <h3 style={styles.name}>{p.name}</h3>
-
             <p style={styles.price}>₹{p.price}</p>
 
-            {/* 🔢 Quantity Selector */}
             <div style={styles.qtyContainer}>
               <button onClick={() => decreaseQty(p.id)} style={styles.qtyBtn}>−</button>
               <span style={styles.qtyText}>{quantities[p.id]}</span>
@@ -156,10 +145,8 @@ const styles = {
   },
 
   name: { margin: "10px 0", fontSize: "20px", color: "#333" },
-
   price: { fontSize: "18px", color: "#009688", marginBottom: "10px" },
 
-  // Quantity
   qtyContainer: {
     display: "flex",
     justifyContent: "center",
