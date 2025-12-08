@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "https://e-commerce-78nv.onrender.com"; 
+const API = "https://e-commerce-78nv.onrender.com";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
@@ -24,13 +24,9 @@ function ProductList() {
   }, []);
 
   const toggleWishlist = (productId) => {
-    let updated = [];
-
-    if (wishlist.includes(productId)) {
-      updated = wishlist.filter(id => id !== productId);
-    } else {
-      updated = [...wishlist, productId];
-    }
+    let updated = wishlist.includes(productId)
+      ? wishlist.filter(id => id !== productId)
+      : [...wishlist, productId];
 
     setWishlist(updated);
     localStorage.setItem("wishlist", JSON.stringify(updated));
@@ -55,121 +51,65 @@ function ProductList() {
       quantity: qty
     })
       .then(() => {
-        alert("Added to cart");
-
+        alert("Added to cart ✅");
         const newCount = (parseInt(localStorage.getItem("cartCount") || "0") + qty);
         localStorage.setItem("cartCount", newCount);
-
         window.dispatchEvent(new Event("storage"));
       })
-      .catch(() => alert("Add to cart failed"));
+      .catch(() => alert("Add to cart failed ❌"));
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Products</h2>
+    <div style={{ padding: "30px" }}>
+      <h2 style={{ fontSize: "28px", marginBottom: "20px" }}>Products</h2>
 
-      <div style={styles.grid}>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+        gap: "25px"
+      }}>
+
         {products.map((p) => (
-          <div key={p.id} style={styles.card} className="card-hover">
+          <div key={p.id} style={{
+            background: "#fff",
+            padding: "15px",
+            borderRadius: "12px",
+            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+            textAlign: "center",
+            position: "relative"
+          }}>
 
             <div
-              style={styles.wishlist}
+              style={{ position: "absolute", top: 10, right: 10, fontSize: "24px", cursor: "pointer" }}
               onClick={() => toggleWishlist(p.id)}
             >
               {wishlist.includes(p.id) ? "❤️" : "🤍"}
             </div>
 
-            <img src={p.image} alt={p.name} style={styles.image} />
+            <img src={p.image} alt={p.name} style={{ width: "180px", height: "180px", objectFit: "contain" }} />
 
-            <h3 style={styles.name}>{p.name}</h3>
-            <p style={styles.price}>₹{p.price}</p>
+            <h3>{p.name}</h3>
+            <p style={{ color: "#009688", fontWeight: "bold" }}>₹{p.price}</p>
 
-            <div style={styles.qtyContainer}>
-              <button onClick={() => decreaseQty(p.id)} style={styles.qtyBtn}>−</button>
-              <span style={styles.qtyText}>{quantities[p.id]}</span>
-              <button onClick={() => increaseQty(p.id)} style={styles.qtyBtn}>+</button>
+            <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+              <button onClick={() => decreaseQty(p.id)}>−</button>
+              <span>{quantities[p.id]}</span>
+              <button onClick={() => increaseQty(p.id)}>+</button>
             </div>
 
-            <button style={styles.button} onClick={() => addToCart(p)}>
+            <button
+              style={{ marginTop: "10px", padding: "8px 12px", background: "#4CAF50", color: "#fff", border: "none" }}
+              onClick={() => addToCart(p)}
+            >
               Add to Cart
             </button>
+
           </div>
         ))}
+
       </div>
     </div>
   );
 }
-
-const styles = {
-  container: { padding: "30px" },
-  title: { fontSize: "28px", fontWeight: "bold", marginBottom: "20px" },
-
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-    gap: "25px",
-  },
-
-  card: {
-    background: "#fff",
-    padding: "15px",
-    borderRadius: "12px",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-    textAlign: "center",
-    position: "relative",
-  },
-
-  wishlist: {
-    position: "absolute",
-    top: 10,
-    right: 10,
-    fontSize: "24px",
-    cursor: "pointer",
-  },
-
-  image: {
-    width: "180px",
-    height: "180px",
-    objectFit: "contain",
-  },
-
-  name: { margin: "10px 0", fontSize: "20px", color: "#333" },
-  price: { fontSize: "18px", color: "#009688", marginBottom: "10px" },
-
-  qtyContainer: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: "12px",
-  },
-
-  qtyBtn: {
-    padding: "5px 10px",
-    fontSize: "18px",
-    cursor: "pointer",
-    borderRadius: "5px",
-    border: "1px solid #ccc",
-    background: "#f5f5f5",
-  },
-
-  qtyText: {
-    margin: "0 12px",
-    fontSize: "18px",
-    minWidth: "20px",
-    display: "inline-block",
-  },
-
-  button: {
-    background: "#4CAF50",
-    color: "white",
-    border: "none",
-    padding: "10px 15px",
-    borderRadius: "8px",
-    cursor: "pointer",
-    fontSize: "16px",
-    width: "100%",
-  }
-};
 
 export default ProductList;
