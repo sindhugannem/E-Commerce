@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
-const API = "http://localhost:8000";
+const API ="https://e-commerce-78nv.onrender.com";
 
 function Navbar() {
   const [count, setCount] = useState(0);
