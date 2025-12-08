@@ -1,50 +1,40 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from pydantic import BaseModel
-from app.config.db import cart_collection
+from app.db.mongo import get_cart, add_to_cart, remove_from_cart, clear_cart
 
 router = APIRouter(prefix="/cart", tags=["Cart"])
 
 
+# ✅ Cart Item Model
 class CartItem(BaseModel):
     product_id: int
     name: str
     price: int
-    image: str
-    quantity: int = 1
+    quantity: int
 
 
-@router.post("/add")
+# ✅ Get all cart items
+@router.get("/", status_code=200)
+def read_cart():
+    return get_cart()
+
+
+# ✅ Add item to cart
+@router.post("/add", status_code=201)
 def add_item(item: CartItem):
-    existing = cart_collection.find_one({"product_id": item.product_id})
-
-    if existing:
-        cart_collection.update_one(
-            {"product_id": item.product_id},
-            {"$inc": {"quantity": 1}}
-        )
-    else:
-        cart_collection.insert_one(item.dict())
-
+    add_to_cart(item.dict())
     return {"message": "Item added to cart"}
 
 
-@router.get("/")
-def get_cart():
-    cart = list(cart_collection.find())
-    for c in cart:
-        c["_id"] = str(c["_id"])
-    return cart
-
-
-@router.delete("/remove/{product_id}")
+# ✅ Remove single item from cart
+@router.delete("/remove/{product_id}", status_code=200)
 def remove_item(product_id: int):
-    result = cart_collection.delete_one({"product_id": product_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return {"message": "Item removed"}
+    remove_from_cart(product_id)
+    return {"message": "Item removed from cart"}
 
 
-@router.delete("/clear")
-def clear_cart():
-    cart_collection.delete_many({})
+# ✅ Clear entire cart
+@router.delete("/clear", status_code=200)
+def clear_all():
+    clear_cart()
     return {"message": "Cart cleared"}

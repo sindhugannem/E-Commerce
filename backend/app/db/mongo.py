@@ -1,6 +1,10 @@
+import os
 from pymongo import MongoClient
 
-client = MongoClient("mongodb://localhost:27017")
+# Get MongoDB Atlas URL from Render Environment
+MONGO_URL = os.getenv("MONGO_URL")
+
+client = MongoClient(MONGO_URL)
 db = client["ecommerce"]
 cart_collection = db["cart"]
 
