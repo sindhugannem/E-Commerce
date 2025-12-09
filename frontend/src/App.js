@@ -1,32 +1,20 @@
-import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import ProductList from "./pages/ProductList";
+import Cart from "./pages/Cart";
+import Wishlist from "./Wishlist";
+import Navbar from "./Navbar";   // ✅ make sure Navbar.jsx exists in src/
 
 function App() {
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-    fetch("https://e-commerce-78nv.onrender.com")
-      .then(res => res.json())
-      .then(data => {
-        console.log("Backend Response:", data);
-        setProducts(data.products || []);
-      })
-      .catch(err => console.error(err));
-  }, []);
-
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Products</h1>
-
-      {products.length === 0 ? (
-        <p>No products found.</p>
-      ) : (
-        <ul>
-          {products.map((p, index) => (
-            <li key={index}>{p.name} — ₹{p.price}</li>
-          ))}
-        </ul>
-      )}
-    </div>
+    <BrowserRouter>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<ProductList />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

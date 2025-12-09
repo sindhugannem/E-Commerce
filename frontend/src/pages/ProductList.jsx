@@ -1,32 +1,39 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = process.env.REACT_APP_API_URL;
+const API = "http://127.0.0.1:8000";
 
 function ProductList() {
   const [products, setProducts] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
   const [quantities, setQuantities] = useState({});
+  const [wishlist, setWishlist] = useState([]);
 
   useEffect(() => {
+    // Load products
     axios.get(`${API}/products`)
       .then(res => {
         setProducts(res.data);
 
-        const storedWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
-        setWishlist(storedWishlist);
-
-        const defaultQty = {};
-        res.data.forEach(p => defaultQty[p.id] = 1);
-        setQuantities(defaultQty);
+        const q = {};
+        res.data.forEach(p => q[p.id] = 1);
+        setQuantities(q);
       })
-      .catch(() => alert("Failed to load products"));
+      .catch(err => console.error("Products error:", err));
+
+    // Load wishlist from localStorage
+    const storedWishlist = JSON.parse(localStorage.getItem("wishlist") || "[]");
+    setWishlist(storedWishlist);
   }, []);
 
-  const toggleWishlist = (productId) => {
-    let updated = wishlist.includes(productId)
-      ? wishlist.filter(id => id !== productId)
-      : [...wishlist, productId];
+  // ✅ TOGGLE WISHLIST
+  const toggleWishlist = (product) => {
+    let updated;
+
+    if (wishlist.find(item => item.id === product.id)) {
+      updated = wishlist.filter(item => item.id !== product.id);
+    } else {
+      updated = [...wishlist, product];
+    }
 
     setWishlist(updated);
     localStorage.setItem("wishlist", JSON.stringify(updated));
@@ -41,72 +48,76 @@ function ProductList() {
   };
 
   const addToCart = (p) => {
-    const qty = quantities[p.id];
-
     axios.post(`${API}/cart/add`, {
       product_id: p.id,
       name: p.name,
       price: p.price,
       image: p.image,
-      quantity: qty
+      quantity: quantities[p.id]
     })
-      .then(() => {
-        alert("Added to cart ✅");
-        const newCount = (parseInt(localStorage.getItem("cartCount") || "0") + qty);
-        localStorage.setItem("cartCount", newCount);
-        window.dispatchEvent(new Event("storage"));
-      })
+      .then(() => alert("Added to cart ✅"))
       .catch(() => alert("Add to cart failed ❌"));
   };
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h2 style={{ fontSize: "28px", marginBottom: "20px" }}>Products</h2>
+    <div style={{ padding: "40px" }}>
+      <h2>🔥 Trending Products</h2>
 
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-        gap: "25px"
-      }}>
-
-        {products.map((p) => (
-          <div key={p.id} style={{
-            background: "#fff",
-            padding: "15px",
-            borderRadius: "12px",
-            boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
-            textAlign: "center",
-            position: "relative"
-          }}>
-
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fill, minmax(230px, 1fr))",
+          gap: "30px"
+        }}
+      >
+        {products.map(p => (
+          <div
+            key={p.id}
+            style={{
+              background: "#ffffff",
+              padding: "18px",
+              borderRadius: "16px",
+              textAlign: "center",
+              boxShadow: "0 6px 15px rgba(0,0,0,0.1)",
+              position: "relative"
+            }}
+          >
+            {/* ❤️ WISHLIST HEART ICON */}
             <div
-              style={{ position: "absolute", top: 10, right: 10, fontSize: "24px", cursor: "pointer" }}
-              onClick={() => toggleWishlist(p.id)}
+              onClick={() => toggleWishlist(p)}
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "12px",
+                fontSize: "22px",
+                cursor: "pointer"
+              }}
             >
-              {wishlist.includes(p.id) ? "❤️" : "🤍"}
+              {wishlist.find(item => item.id === p.id) ? "❤️" : "🤍"}
             </div>
 
-            <img src={p.image} alt={p.name} style={{ width: "180px", height: "180px", objectFit: "contain" }} />
+            <img
+              src={p.image}
+              alt={p.name}
+              style={{ width: "180px", height: "180px", objectFit: "contain" }}
+            />
 
             <h3>{p.name}</h3>
-            <p style={{ color: "#009688", fontWeight: "bold" }}>₹{p.price}</p>
+            <h4>₹{p.price}</h4>
 
-            <div style={{ display: "flex", justifyContent: "center", gap: "10px" }}>
+            <div style={{ marginBottom: "10px" }}>
               <button onClick={() => decreaseQty(p.id)}>−</button>
-              <span>{quantities[p.id]}</span>
+              <span style={{ margin: "0 10px" }}>
+                {quantities[p.id]}
+              </span>
               <button onClick={() => increaseQty(p.id)}>+</button>
             </div>
 
-            <button
-              style={{ marginTop: "10px", padding: "8px 12px", background: "#4CAF50", color: "#fff", border: "none" }}
-              onClick={() => addToCart(p)}
-            >
+            <button onClick={() => addToCart(p)}>
               Add to Cart
             </button>
-
           </div>
         ))}
-
       </div>
     </div>
   );

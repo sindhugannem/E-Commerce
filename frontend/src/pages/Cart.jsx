@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = process.env.REACT_APP_API_URL;
+const API = "http://127.0.0.1:8000";
 
 function Cart() {
   const [cart, setCart] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
 
   const loadCart = () => {
-    axios.get(`${API}/cart`)
-      .then(res => setCart(res.data))
-      .catch(() => alert("Failed to load cart ❌"));
+    axios.get(`${API}/cart`).then(res => setCart(res.data));
   };
 
   useEffect(() => {
@@ -18,69 +16,73 @@ function Cart() {
   }, []);
 
   const removeItem = (id) => {
-    axios.delete(`${API}/cart/remove/${id}`)
-      .then(() => {
-        loadCart();
-        window.dispatchEvent(new Event("storage"));
-      })
-      .catch(() => alert("Remove failed ❌"));
+    axios.delete(`${API}/cart/remove/${id}`).then(loadCart);
   };
 
   const checkout = () => {
     setShowPopup(true);
-
-    axios.delete(`${API}/cart/clear`)
-      .then(() => {
-        loadCart();
-        window.dispatchEvent(new Event("storage"));
-      });
+    axios.delete(`${API}/cart/clear`).then(loadCart);
   };
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   return (
-    <div style={{ padding: "30px" }}>
-      <h2>Your Cart</h2>
+    <div style={{ padding: "40px" }}>
+      <h2>🛒 Your Shopping Cart</h2>
 
-      {cart.length === 0 ? (
-        <p>No items in cart</p>
-      ) : (
+      {cart.length === 0 ? <h3 style={{ textAlign: "center" }}>Cart is Empty 😢</h3> : (
         <>
           {cart.map(item => (
             <div key={item.product_id} style={{
               display: "flex",
-              gap: "20px",
-              borderBottom: "1px solid #ddd",
-              padding: "10px"
+              alignItems: "center",
+              justifyContent: "space-between",
+              background: "white",
+              padding: "15px",
+              marginBottom: "12px",
+              borderRadius: "12px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
             }}>
-              <img src={item.image} alt={item.name} style={{ width: 90 }} />
-
+              <img src={item.image} width="70" />
               <div>
-                <h3>{item.name}</h3>
+                <h4>{item.name}</h4>
                 <p>₹{item.price} × {item.quantity}</p>
-
-                <button onClick={() => removeItem(item.product_id)}>
-                  Remove
-                </button>
               </div>
+
+              <button
+                style={{ background: "#f44336", color: "white" }}
+                onClick={() => removeItem(item.product_id)}
+              >
+                Remove
+              </button>
             </div>
           ))}
 
-          <h3>Total: ₹{total}</h3>
+          <h2 style={{ textAlign: "right" }}>Total: ₹{total}</h2>
 
-          <button onClick={checkout} style={{ padding: "10px 20px" }}>
-            Checkout
+          <button
+            style={{
+              width: "100%",
+              padding: "12px",
+              background: "#4CAF50",
+              color: "white",
+              fontSize: "18px"
+            }}
+            onClick={checkout}
+          >
+            ✅ Checkout Securely
           </button>
         </>
       )}
 
-      {/* ✅ Success Popup */}
       {showPopup && (
         <div style={{
           position: "fixed",
-          top: 0, left: 0,
-          width: "100%", height: "100%",
-          background: "rgba(0,0,0,0.5)",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          background: "rgba(0,0,0,0.6)",
           display: "flex",
           justifyContent: "center",
           alignItems: "center"
@@ -88,16 +90,11 @@ function Cart() {
           <div style={{
             background: "white",
             padding: "30px",
-            borderRadius: "12px",
-            width: "300px",
+            borderRadius: "14px",
             textAlign: "center"
           }}>
-            <h2>Order Placed Successfully 🎉</h2>
-            <p>Your order has been confirmed!</p>
-
-            <button onClick={() => setShowPopup(false)}>
-              Close
-            </button>
+            <h2>🎉 Order Successful!</h2>
+            <button onClick={() => setShowPopup(false)}>Close</button>
           </div>
         </div>
       )}
