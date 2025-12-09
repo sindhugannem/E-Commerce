@@ -1,22 +1,31 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+
+const API = "http://192.168.1.10:8000";
+
 
 function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
 
+  // ✅ Load wishlist from BACKEND (shared across all systems)
   useEffect(() => {
-    const stored = JSON.parse(localStorage.getItem("wishlist") || "[]");
-    setWishlist(stored);
+    axios.get(`${API}/wishlist`)
+      .then(res => setWishlist(res.data))
+      .catch(err => console.error("Wishlist load error:", err));
   }, []);
 
+  // ✅ Remove from BACKEND wishlist
   const removeFromWishlist = (id) => {
-    const updated = wishlist.filter(item => item.id !== id);
-    setWishlist(updated);
-    localStorage.setItem("wishlist", JSON.stringify(updated));
+    axios.delete(`${API}/wishlist/remove/${id}`)
+      .then(() => {
+        setWishlist(prev => prev.filter(item => item.id !== id));
+      })
+      .catch(err => console.error("Wishlist remove error:", err));
   };
 
   return (
     <div style={{ padding: "40px" }}>
-      <h2>❤️ Your Wishlist</h2>
+      <h2>❤️ Shared Wishlist</h2>
 
       {wishlist.length === 0 ? (
         <h3 style={{ textAlign: "center" }}>Your wishlist is empty 😢</h3>
@@ -39,6 +48,7 @@ function Wishlist() {
                 alt={item.name}
                 style={{ width: "160px", height: "160px", objectFit: "contain" }}
               />
+
               <h3>{item.name}</h3>
               <h4 style={{ color: "#ff5722" }}>₹{item.price}</h4>
 
@@ -47,7 +57,11 @@ function Wishlist() {
                 style={{
                   background: "#f44336",
                   color: "white",
-                  marginTop: "10px"
+                  marginTop: "10px",
+                  padding: "8px 14px",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer"
                 }}
               >
                 Remove ❌

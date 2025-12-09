@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProductList from "./pages/ProductList";
 import Cart from "./pages/Cart";
 import Wishlist from "./Wishlist";
-import Navbar from "./Navbar";   // ✅ make sure Navbar.jsx exists in src/
+import Navbar from "./Navbar";
 
 function App() {
   return (

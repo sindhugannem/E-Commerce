@@ -1,105 +1,66 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 
-const API = "http://127.0.0.1:8000";
+const API = "http://192.168.1.10:8000";
 
-function Cart() {
-  const [cart, setCart] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
 
-  const loadCart = () => {
-    axios.get(`${API}/cart`).then(res => setCart(res.data));
+const Cart = () => {
+  const [cartItems, setCartItems] = useState([]);
+  const [total, setTotal] = useState(0);
+
+  const loadCart = async () => {
+    try {
+      const res = await axios.get(`${API}/cart`);
+      setCartItems(res.data);
+
+      let sum = 0;
+      res.data.forEach((item) => {
+        sum += item.price * item.quantity;
+      });
+      setTotal(sum);
+    } catch (err) {
+      console.error("Cart fetch error:", err);
+    }
   };
 
   useEffect(() => {
     loadCart();
   }, []);
 
-  const removeItem = (id) => {
-    axios.delete(`${API}/cart/remove/${id}`).then(loadCart);
-  };
-
-  const checkout = () => {
-    setShowPopup(true);
-    axios.delete(`${API}/cart/clear`).then(loadCart);
-  };
-
-  const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
-
   return (
-    <div style={{ padding: "40px" }}>
-      <h2>🛒 Your Shopping Cart</h2>
+    <div>
+      <h2>🛒 Your Cart</h2>
 
-      {cart.length === 0 ? <h3 style={{ textAlign: "center" }}>Cart is Empty 😢</h3> : (
-        <>
-          {cart.map(item => (
-            <div key={item.product_id} style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              background: "white",
-              padding: "15px",
-              marginBottom: "12px",
-              borderRadius: "12px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)"
-            }}>
-              <img src={item.image} width="70" />
-              <div>
-                <h4>{item.name}</h4>
-                <p>₹{item.price} × {item.quantity}</p>
-              </div>
+      {cartItems.length === 0 && <p>No items in cart</p>}
 
-              <button
-                style={{ background: "#f44336", color: "white" }}
-                onClick={() => removeItem(item.product_id)}
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-
-          <h2 style={{ textAlign: "right" }}>Total: ₹{total}</h2>
-
-          <button
-            style={{
-              width: "100%",
-              padding: "12px",
-              background: "#4CAF50",
-              color: "white",
-              fontSize: "18px"
-            }}
-            onClick={checkout}
-          >
-            ✅ Checkout Securely
-          </button>
-        </>
-      )}
-
-      {showPopup && (
-        <div style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          background: "rgba(0,0,0,0.6)",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center"
-        }}>
-          <div style={{
-            background: "white",
-            padding: "30px",
-            borderRadius: "14px",
-            textAlign: "center"
-          }}>
-            <h2>🎉 Order Successful!</h2>
-            <button onClick={() => setShowPopup(false)}>Close</button>
-          </div>
+      {cartItems.map((item) => (
+        <div key={item.product_id}>
+          <h4>{item.name}</h4>
+          <p>
+            ₹{item.price} x {item.quantity}
+          </p>
         </div>
+      ))}
+
+      <h3>💰 Total: ₹{total}</h3>
+
+      {cartItems.length > 0 && (
+        <button
+          onClick={() => alert("✅  Checkout Successful")}
+          style={{
+            padding: "10px 20px",
+            background: "green",
+            color: "white",
+            border: "none",
+            cursor: "pointer",
+            marginTop: "15px",
+          }}
+        >
+          ✅ Checkout
+        </button>
       )}
     </div>
   );
-}
+};
 
 export default Cart;
